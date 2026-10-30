@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Personal Insights & Memory — Echo Journal{% endblock %}
+{% block content %}
+<div class="journal-container">
+  <div class="hero-text-block">
+    <h1 class="page-title">Personal Reflections & Patterns</h1>
+    <p class="page-subtitle">Understand recurring themes and emotional trajectories over time without causal speculation.</p>
+  </div>
+
+  <!-- Medical & Causation Disclaimer -->
+  <div class="disclaimer-banner">
+    <strong>Scientific & Ethical Notice:</strong> Echo Journal is a self-reflection tool, not a medical or diagnostic system.
+    Patterns describe observed co-occurrences in your writing, never biological or psychological causation.
+  </div>
+
+  {% if not patterns.eligible %}
+  <!-- Under 10 entries threshold card -->
+  <div class="status-card-notice warning">
+    <div class="notice-badge">Sample Size Safeguard ({{ patterns.entry_count }}/{{ patterns.required_count }} Entries)</div>
+    <h3 class="notice-title">Longitudinal Patterns Locked</h3>
+    <p class="notice-body">
+      {{ patterns.message }}
+    </p>
+    <div class="notice-footer">
+      <span>{{ patterns.disclaimer }}</span>
+      <a href="{{ url_for('journal.write') }}" class="btn btn-primary btn-sm">Write an Entry</a>
+    </div>
+  </div>
+  {% else %}
+  <!-- Milestone 3 Activated Patterns -->
+  <div class="insights-grid">
+    <!-- Emotion Distribution -->
+    <div class="insight-card">
+      <h3 class="card-title">Emotion Distribution (Ekman Taxonomy)</h3>
+      <p class="card-desc">Frequency of primary emotions across your {{ patterns.entry_count }} entries.</p>
+      <div class="emotion-bars">
+        {% for emo, count in patterns.emotion_distribution.items() %}
+        <div class="bar-row">
+          <span class="bar-label">{{ emo | capitalize }}</span>
+          <div class="bar-track">
+            <div class="bar-fill" style="width: {{ (count / patterns.entry_count * 100) | round }}%;"></div>
+          </div>
+          <span class="bar-count">{{ count }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Observed Tag-Emotion Co-occurrences -->
+    <div class="insight-card">
+      <h3 class="card-title">Observed Co-Occurrences</h3>
+      <p class="card-desc">Non-causal linguistic associations between topic tags and feelings.</p>
+      {% if patterns.co_occurrences %}
+        <ul class="co-occurrence-list">
+          {% for co in patterns.co_occurrences %}
+          <li class="co-item">
+            <span class="tag-pill">#{{ co.tag }}</span>
+            <span class="co-text">{{ co.observation }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="empty-state-muted">Tags have not yet reached the co-occurrence threshold.</p>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Ask Your Journal (Conversational Grounded RAG) -->
+  <div class="ask-journal-card">
+    <div class="card-header-flex">
+      <div>
+        <h3 class="card-title">Ask Your Journal</h3>
+        <p class="card-desc">Synthesizes answers strictly using citations and quotes from your own entries.</p>
+      </div>
+      <div class="privacy-badge">
+        {% if opted_in %}
+        <span class="badge-opted-in">External AI Opted-In</span>
+        {% else %}
+        <span class="badge-local-only">Strict Local Privacy</span>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if not opted_in %}
+    <div class="consent-notice-box">
+      <p>External AI reflection is currently turned off to protect your privacy. You can enable it in <a href="{{ url_for('account.settings') }}">Account Settings</a>.</p>
+    </div>
+    {% endif %}
+
+    <div class="query-form-group">
+      <input type="text" id="journalQueryInput" class="form-input" placeholder="e.g. What did I write about my college project?">
+      <button type="button" id="askButton" class="btn btn-primary">Reflect</button>
+    </div>
+
+    <div id="queryResultContainer" class="query-result-box" style="display: none;">
+      <!-- Dynamic answers inserted via JS -->
+    </div>
+  </div>
+</div>
+{% endblock %}

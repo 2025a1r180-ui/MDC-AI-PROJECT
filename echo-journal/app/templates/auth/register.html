@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Create Private Journal — Echo Journal{% endblock %}
+{% block content %}
+<div class="auth-card-container">
+  <div class="auth-header">
+    <h1 class="auth-title">Begin Your Journal</h1>
+    <p class="auth-subtitle">Encrypted passwords (scrypt), strict account isolation, zero data sharing.</p>
+  </div>
+
+  <form method="POST" action="{{ url_for('auth.register') }}" class="standard-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    
+    <div class="form-group">
+      <label for="username" class="form-label">Username</label>
+      <input type="text" id="username" name="username" value="{{ username or '' }}" required autofocus class="form-input" placeholder="e.g. solowriter" minlength="3" maxlength="30">
+      <span class="field-hint">3–30 characters, letters, numbers, dash/underscore.</span>
+    </div>
+
+    <div class="form-group">
+      <label for="email" class="form-label">Email Address</label>
+      <input type="email" id="email" name="email" value="{{ email or '' }}" required class="form-input" placeholder="you@domain.com">
+    </div>
+
+    <div class="form-group">
+      <label for="password" class="form-label">Password</label>
+      <input type="password" id="password" name="password" required class="form-input" minlength="8" autocomplete="new-password">
+      <span class="field-hint">Minimum 8 characters with letters and numbers/symbols.</span>
+    </div>
+
+    <div class="form-group">
+      <label for="confirm_password" class="form-label">Confirm Password</label>
+      <input type="password" id="confirm_password" name="confirm_password" required class="form-input" minlength="8" autocomplete="new-password">
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="button-primary full-width">Create Private Journal</button>
+    </div>
+  </form>
+
+  <div class="auth-footer-link">
+    Already registered? <a href="{{ url_for('auth.login') }}">Sign In</a>
+  </div>
+</div>
+{% endblock %}

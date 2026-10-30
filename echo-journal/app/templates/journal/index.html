@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Your Entries — Echo Journal{% endblock %}
+{% block content %}
+<div class="journal-container">
+  <div class="journal-hero-strip">
+    <div class="hero-text-block">
+      <h1 class="page-title">Personal Archive</h1>
+      <p class="page-subtitle">Your private reflections, sorted chronologically. All text remains strictly local to your account.</p>
+    </div>
+    <div class="hero-action-block">
+      <a href="{{ url_for('journal.create') }}" class="button-primary">+ New Entry</a>
+    </div>
+  </div>
+
+  <!-- Search & Filter Controls -->
+  <div class="search-filter-bar">
+    <form method="GET" action="{{ url_for('journal.index') }}" class="search-form">
+      <input type="text" name="q" value="{{ search_query or '' }}" placeholder="Search by title, phrase, or topic..." class="search-input">
+      {% if selected_mood %}
+        <input type="hidden" name="mood" value="{{ selected_mood }}">
+      {% endif %}
+      <button type="submit" class="button-secondary">Search</button>
+      {% if search_query or selected_mood or selected_tag %}
+        <a href="{{ url_for('journal.index') }}" class="button-quiet">Clear filters</a>
+      {% endif %}
+    </form>
+
+    <div class="filter-mood-row">
+      <span class="filter-label">Mood filter:</span>
+      <a href="{{ url_for('journal.index', q=search_query) }}" class="mood-link {% if not selected_mood %}active{% endif %}">All</a>
+      <a href="{{ url_for('journal.index', mood='calm', q=search_query) }}" class="mood-link {% if selected_mood == 'calm' %}active{% endif %}">Calm</a>
+      <a href="{{ url_for('journal.index', mood='reflective', q=search_query) }}" class="mood-link {% if selected_mood == 'reflective' %}active{% endif %}">Reflective</a>
+      <a href="{{ url_for('journal.index', mood='joyful', q=search_query) }}" class="mood-link {% if selected_mood == 'joyful' %}active{% endif %}">Joyful</a>
+      <a href="{{ url_for('journal.index', mood='grateful', q=search_query) }}" class="mood-link {% if selected_mood == 'grateful' %}active{% endif %}">Grateful</a>
+      <a href="{{ url_for('journal.index', mood='overwhelmed', q=search_query) }}" class="mood-link {% if selected_mood == 'overwhelmed' %}active{% endif %}">Overwhelmed</a>
+      <a href="{{ url_for('journal.index', mood='anxious', q=search_query) }}" class="mood-link {% if selected_mood == 'anxious' %}active{% endif %}">Anxious</a>
+    </div>
+  </div>
+
+  <!-- Export Bar -->
+  <div class="archive-meta-strip">
+    <div class="entry-count-text">
+      {{ entries|length }} {% if entries|length == 1 %}entry{% else %}entries{% endif %} recorded
+      {% if search_query %} matching "{{ search_query }}"{% endif %}
+    </div>
+    <div class="export-actions">
+      <span class="export-label">Export Archive:</span>
+      <a href="{{ url_for('journal.export_json') }}" class="text-action-link">JSON</a>
+      <span class="meta-divider">·</span>
+      <a href="{{ url_for('journal.export_markdown') }}" class="text-action-link">Markdown (.md)</a>
+    </div>
+  </div>
+
+  <!-- Entries Stream -->
+  <div class="entries-stream">
+    {% if entries %}
+      {% for entry in entries %}
+        <article class="entry-card">
+          <div class="entry-header">
+            <h2 class="entry-title">
+              <a href="{{ url_for('journal.view', entry_id=entry['id']) }}" class="entry-title-link">
+                {{ entry['title'] }}
+              </a>
+            </h2>
+            <div class="entry-metadata">
+              <span>{{ entry['created_at'][:10] }}</span>
+              <span class="meta-divider">·</span>
+              <span>{{ entry['word_count'] }} words</span>
+              <span class="meta-divider">·</span>
+              <span>{{ entry['reading_time_minutes'] }} min read</span>
+              {% if entry['mood'] %}
+                <span class="meta-divider">·</span>
+                <span class="meta-mood">{{ entry['mood']|capitalize }}</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <p class="entry-preview">
+            {{ entry['content'][:240] }}{% if entry['content']|length > 240 %}...{% endif %}
+          </p>
+
+          <div class="entry-footer">
+            <div class="entry-tags">
+              {% if entry['tags'] %}
+                {% for tag in entry['tags'].split(',') %}
+                  {% if tag %}
+                    <a href="{{ url_for('journal.index', tag=tag) }}" class="tag-link">#{{ tag }}</a>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            </div>
+            <div class="entry-card-actions">
+              <a href="{{ url_for('journal.view', entry_id=entry['id']) }}" class="card-action-link">Read</a>
+              <span class="meta-divider">·</span>
+              <a href="{{ url_for('journal.edit', entry_id=entry['id']) }}" class="card-action-link">Edit</a>
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state-box">
+        <h3 class="empty-state-title">No entries found</h3>
+        <p class="empty-state-text">
+          {% if search_query or selected_mood or selected_tag %}
+            No journal entries match the current search filters.
+            <a href="{{ url_for('journal.index') }}">Reset filters</a>.
+          {% else %}
+            You haven't recorded any reflections yet. Your journal is a sanctuary for your private thoughts.
+          {% endif %}
+        </p>
+        <a href="{{ url_for('journal.create') }}" class="button-primary">+ Write Your First Entry</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

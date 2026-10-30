@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}New Reflection — Echo Journal{% endblock %}
+{% block content %}
+<div class="editor-container">
+  <div class="editor-header">
+    <a href="{{ url_for('journal.index') }}" class="back-link">← Return to archive</a>
+    <h1 class="page-title">Record Reflection</h1>
+    <p class="page-subtitle">Take your time. No word is sent externally without explicit consent.</p>
+  </div>
+
+  <form method="POST" action="{{ url_for('journal.create') }}" class="entry-editor-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+    <div class="form-group">
+      <label for="title" class="form-label">Title</label>
+      <input type="text" id="title" name="title" value="{{ title or '' }}" required autofocus class="form-input editor-title-input" placeholder="Give this moment a title..." maxlength="200">
+    </div>
+
+    <div class="meta-inputs-grid">
+      <div class="form-group">
+        <label for="mood" class="form-label">Dominant Mood (Optional)</label>
+        <select id="mood" name="mood" class="form-select">
+          <option value="">-- Select emotional state --</option>
+          <option value="calm" {% if mood == 'calm' %}selected{% endif %}>Calm</option>
+          <option value="reflective" {% if mood == 'reflective' %}selected{% endif %}>Reflective</option>
+          <option value="joyful" {% if mood == 'joyful' %}selected{% endif %}>Joyful</option>
+          <option value="grateful" {% if mood == 'grateful' %}selected{% endif %}>Grateful</option>
+          <option value="overwhelmed" {% if mood == 'overwhelmed' %}selected{% endif %}>Overwhelmed</option>
+          <option value="anxious" {% if mood == 'anxious' %}selected{% endif %}>Anxious</option>
+          <option value="sad" {% if mood == 'sad' %}selected{% endif %}>Sad</option>
+          <option value="neutral" {% if mood == 'neutral' %}selected{% endif %}>Neutral</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="tags" class="form-label">Tags (Optional, comma-separated)</label>
+        <input type="text" id="tags" name="tags" value="{{ tags or '' }}" class="form-input" placeholder="e.g. morning, study, nature">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="content" class="form-label">Journal Text</label>
+      <textarea id="content" name="content" required class="form-textarea" rows="14" placeholder="Write freely here. What happened, how did it feel, what does it mean to you?">{{ content or '' }}</textarea>
+      <div class="editor-stats-bar">
+        <span id="live-word-count">0 words</span>
+        <span class="meta-divider">·</span>
+        <span id="live-char-count">0 characters</span>
+      </div>
+    </div>
+
+    <div class="editor-submit-strip">
+      <a href="{{ url_for('journal.index') }}" class="button-quiet">Discard Draft</a>
+      <button type="submit" class="button-primary">Save Private Entry</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

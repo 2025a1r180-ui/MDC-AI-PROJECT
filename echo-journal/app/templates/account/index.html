@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Account Settings & Privacy — Echo Journal{% endblock %}
+{% block content %}
+<div class="account-container">
+  <div class="account-header">
+    <h1 class="page-title">Account & Privacy Controls</h1>
+    <p class="page-subtitle">Manage your credentials, external service permissions, and data sovereignity.</p>
+  </div>
+
+  <!-- Profile Card -->
+  <section class="settings-section">
+    <h2 class="section-title">Profile Information</h2>
+    <div class="settings-card">
+      <div class="info-row">
+        <span class="info-label">Username</span>
+        <span class="info-value font-mono">{{ user['username'] }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Email Address</span>
+        <span class="info-value">{{ user['email'] }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Total Reflections</span>
+        <span class="info-value">{{ entry_count }} entries recorded</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Password Protection</span>
+        <span class="info-value">Hashed with memory-hard scrypt (N=16384, r=8, p=1)</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Privacy & External AI Opt-in -->
+  <section class="settings-section">
+    <h2 class="section-title">Privacy & External Processing Consent</h2>
+    <div class="settings-card">
+      <p class="settings-description">
+        <strong>Non-negotiable privacy guarantee:</strong> By default, zero journal content leaves your local server.
+        External LLM features (such as "Ask your journal" in Milestone 3) require your explicit, revocable opt-in.
+      </p>
+
+      <div class="consent-status-strip">
+        <div class="status-col">
+          <span class="status-label">Current External AI Status:</span>
+          {% if user['opt_in_external_ai'] %}
+            <span class="status-active">Opted In (External analysis permitted)</span>
+          {% else %}
+            <span class="status-inactive">Strict Local Mode (Zero external transmission)</span>
+          {% endif %}
+        </div>
+
+        <form method="POST" action="{{ url_for('account.toggle_opt_in') }}" class="inline-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          {% if user['opt_in_external_ai'] %}
+            <input type="hidden" name="opt_in" value="false">
+            <button type="submit" class="button-secondary">Revoke External AI Consent</button>
+          {% else %}
+            <input type="hidden" name="opt_in" value="true">
+            <button type="submit" class="button-primary">Opt-In to External AI</button>
+          {% endif %}
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Data Sovereignty & Export -->
+  <section class="settings-section">
+    <h2 class="section-title">Data Sovereignty & Portability</h2>
+    <div class="settings-card">
+      <p class="settings-description">
+        You own all your reflections. Download your complete journal archive at any time in standard, human-readable formats.
+      </p>
+      <div class="export-button-row">
+        <a href="{{ url_for('journal.export_json') }}" class="button-secondary">Download Archive (JSON)</a>
+        <a href="{{ url_for('journal.export_markdown') }}" class="button-secondary">Download Archive (Markdown)</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Danger Zone: Full Account Deletion -->
+  <section class="settings-section danger-zone-section">
+    <h2 class="section-title text-danger">Danger Zone: Permanent Deletion</h2>
+    <div class="settings-card danger-card">
+      <p class="settings-description">
+        Deleting your account completely purges your user record and cascades to erase all journal entries and search indexes. This action cannot be reversed.
+      </p>
+
+      <form method="POST" action="{{ url_for('account.delete_account') }}" class="standard-form danger-form" onsubmit="return confirm('CRITICAL WARNING: This will permanently delete your account and ALL journal entries. Are you sure?');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        
+        <div class="form-group">
+          <label for="confirm_password" class="form-label">Enter your password to confirm deletion</label>
+          <input type="password" id="confirm_password" name="confirm_password" required class="form-input" placeholder="Current password">
+        </div>
+
+        <button type="submit" class="button-danger">Permanently Erase Account and Data</button>
+      </form>
+    </div>
+  </section>
+</div>
+{% endblock %}

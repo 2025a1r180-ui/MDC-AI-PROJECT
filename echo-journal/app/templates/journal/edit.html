@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Edit Reflection — Echo Journal{% endblock %}
+{% block content %}
+<div class="editor-container">
+  <div class="editor-header">
+    <a href="{{ url_for('journal.view', entry_id=entry['id']) }}" class="back-link">← Return to entry</a>
+    <h1 class="page-title">Edit Reflection</h1>
+    <p class="page-subtitle">Refining thoughts previously recorded on {{ entry['created_at'][:10] }}.</p>
+  </div>
+
+  <form method="POST" action="{{ url_for('journal.edit', entry_id=entry['id']) }}" class="entry-editor-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+    <div class="form-group">
+      <label for="title" class="form-label">Title</label>
+      <input type="text" id="title" name="title" value="{{ title if title is not none else entry['title'] }}" required autofocus class="form-input editor-title-input" maxlength="200">
+    </div>
+
+    <div class="meta-inputs-grid">
+      <div class="form-group">
+        <label for="mood" class="form-label">Dominant Mood</label>
+        <select id="mood" name="mood" class="form-select">
+          <option value="">-- Select emotional state --</option>
+          {% set current_mood = mood if mood is not none else entry['mood'] %}
+          <option value="calm" {% if current_mood == 'calm' %}selected{% endif %}>Calm</option>
+          <option value="reflective" {% if current_mood == 'reflective' %}selected{% endif %}>Reflective</option>
+          <option value="joyful" {% if current_mood == 'joyful' %}selected{% endif %}>Joyful</option>
+          <option value="grateful" {% if current_mood == 'grateful' %}selected{% endif %}>Grateful</option>
+          <option value="overwhelmed" {% if current_mood == 'overwhelmed' %}selected{% endif %}>Overwhelmed</option>
+          <option value="anxious" {% if current_mood == 'anxious' %}selected{% endif %}>Anxious</option>
+          <option value="sad" {% if current_mood == 'sad' %}selected{% endif %}>Sad</option>
+          <option value="neutral" {% if current_mood == 'neutral' %}selected{% endif %}>Neutral</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="tags" class="form-label">Tags (comma-separated)</label>
+        <input type="text" id="tags" name="tags" value="{{ tags if tags is not none else entry['tags'] }}" class="form-input">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="content" class="form-label">Journal Text</label>
+      <textarea id="content" name="content" required class="form-textarea" rows="14">{{ content if content is not none else entry['content'] }}</textarea>
+      <div class="editor-stats-bar">
+        <span id="live-word-count">{{ entry['word_count'] }} words</span>
+        <span class="meta-divider">·</span>
+        <span id="live-char-count">{{ entry['content']|length }} characters</span>
+      </div>
+    </div>
+
+    <div class="editor-submit-strip">
+      <a href="{{ url_for('journal.view', entry_id=entry['id']) }}" class="button-quiet">Cancel</a>
+      <button type="submit" class="button-primary">Save Changes</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,6 @@
+{
+  "name": "Echo Journal",
+  "description": "A privacy-focused, AI-powered journaling and self-reflection web application with strict account isolation, local encryption, and calm editorial design.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
