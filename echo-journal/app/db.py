@@ -34,6 +34,15 @@ def get_db_connection(db_path: Optional[str] = None) -> sqlite3.Connection:
     return conn
 
 
+def get_db() -> sqlite3.Connection:
+    """Return the request-scoped database connection used by Flask routes."""
+    from flask import current_app, g
+
+    if "db_conn" not in g:
+        g.db_conn = get_db_connection(current_app.config.get("DATABASE_PATH"))
+    return g.db_conn
+
+
 def init_db(conn: sqlite3.Connection):
     """Initialize schema tables with indexes and full-text search."""
     cursor = conn.cursor()
