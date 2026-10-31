@@ -23,7 +23,7 @@
     </p>
     <div class="notice-footer">
       <span>{{ patterns.disclaimer }}</span>
-      <a href="{{ url_for('journal.write') }}" class="btn btn-primary btn-sm">Write an Entry</a>
+      <a href="{{ url_for('journal.create') }}" class="btn btn-primary btn-sm">Write an Entry</a>
     </div>
   </div>
   {% else %}
@@ -84,7 +84,7 @@
 
     {% if not opted_in %}
     <div class="consent-notice-box">
-      <p>External AI reflection is currently turned off to protect your privacy. You can enable it in <a href="{{ url_for('account.settings') }}">Account Settings</a>.</p>
+      <p>External AI reflection is currently turned off to protect your privacy. You can enable it in <a href="{{ url_for('account.index') }}">Account Settings</a>.</p>
     </div>
     {% endif %}
 
